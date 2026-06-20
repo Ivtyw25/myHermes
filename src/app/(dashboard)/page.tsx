@@ -1,22 +1,17 @@
-import { readMonth } from '@/lib/csv'
+import {
+  readMonth,
+  readMonths,
+  aggregateByCategoryDonut,
+  aggregateDailySpend,
+  aggregateByCategoryMonth,
+} from '@/lib/csv'
 import { getAvailableMonths, parseMonthParam } from '@/lib/months'
-import { formatMonthLabel } from '@/lib/format'
+import { formatMonthLabel, formatMonthShort } from '@/lib/format'
 import KPICards from '@/components/KPICards'
 import TopTransactions from '@/components/TopTransactions'
-import { Card } from '@/components/ui/card'
+import OverviewCharts from '@/components/OverviewCharts'
 
 export const dynamic = 'force-dynamic'
-
-function ChartPlaceholder({ title }: { title: string }) {
-  return (
-    <Card className="flex h-64 flex-col p-6">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{title}</p>
-      <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-muted-foreground">Chart added in Phase 3</p>
-      </div>
-    </Card>
-  )
-}
 
 export default async function OverviewPage({
   searchParams,
@@ -27,7 +22,11 @@ export default async function OverviewPage({
   const months = await getAvailableMonths()
   const { year, monthNum, key } = parseMonthParam(month, months[0] ?? '')
 
-  const transactions = await readMonth(year, monthNum)
+  const [transactions, multiMonth] = await Promise.all([
+    readMonth(year, monthNum),
+    readMonths(key, 6),
+  ])
+
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
     .reduce((s, t) => s + t.amount, 0)
@@ -35,10 +34,24 @@ export default async function OverviewPage({
     .filter((t) => t.type === 'expense')
     .reduce((s, t) => s + t.amount, 0)
   const netBalance = Math.round((totalIncome - totalExpense) * 100) / 100
+
   const topExpenses = transactions
     .filter((t) => t.type === 'expense')
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 5)
+
+  const donut = aggregateByCategoryDonut(transactions)
+  const daily = aggregateDailySpend(transactions)
+  const trend = aggregateByCategoryMonth(multiMonth)
+  const monthly = Object.entries(multiMonth).map(([k, txns]) => ({
+    month: formatMonthShort(k),
+    income:
+      Math.round(txns.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0) * 100) /
+      100,
+    expense:
+      Math.round(txns.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0) * 100) /
+      100,
+  }))
 
   return (
     <div className="space-y-8">
@@ -49,10 +62,7 @@ export default async function OverviewPage({
 
       <KPICards totalIncome={totalIncome} totalExpense={totalExpense} netBalance={netBalance} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <ChartPlaceholder title="Spending by category" />
-        <ChartPlaceholder title="Cumulative spending" />
-      </div>
+      <OverviewCharts donut={donut} daily={daily} monthly={monthly} trend={trend} />
 
       <TopTransactions transactions={topExpenses} />
     </div>

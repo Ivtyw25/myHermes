@@ -15,3 +15,12 @@ export function formatMonthLabel(key: string): string {
     year: 'numeric',
   })
 }
+
+export function formatMonthShort(key: string): string {
+  if (!/^\d{4}-\d{2}$/.test(key)) return key
+  const [y, m] = key.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('en-MY', {
+    month: 'short',
+    year: '2-digit',
+  })
+}

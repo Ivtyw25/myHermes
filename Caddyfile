@@ -1,0 +1,30 @@
+# Hermes Dashboard — Caddy reverse proxy with rate limiting.
+#
+# Rate limiting needs the caddy-ratelimit module (not in stock Caddy). Build it:
+#   go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+#   ~/go/bin/xcaddy build --with github.com/mholt/caddy-ratelimit
+#   sudo mv caddy /usr/local/bin/caddy && caddy version
+#
+# Replace yourdomain.com with your real domain, then:  caddy start --config Caddyfile
+# Caddy provisions HTTPS automatically and redirects HTTP -> HTTPS.
+
+{
+	# caddy-ratelimit is a third-party directive; tell Caddy where it sits.
+	order rate_limit before reverse_proxy
+}
+
+yourdomain.com {
+	encode zstd gzip
+
+	# Throttle auth endpoints: max 10 requests per IP per minute -> 11th gets HTTP 429.
+	@auth path /api/auth/*
+	rate_limit @auth {
+		zone auth_zone {
+			key {remote_host}
+			events 10
+			window 1m
+		}
+	}
+
+	reverse_proxy localhost:3000
+}

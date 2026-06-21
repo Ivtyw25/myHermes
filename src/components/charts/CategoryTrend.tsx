@@ -47,7 +47,19 @@ export default function CategoryTrend({ data }: CategoryTrendProps) {
   }
 
   const categories = Object.keys(data[0]).filter((k) => k !== 'month')
-  const keyToSlug = new Map(categories.map((c) => [c, slug(c)]))
+  // Build unique slugs. Distinct categories can slug to the same string
+  // (e.g. the real "other" category and the "Other" tail bucket both -> "other"),
+  // which would collide as CSS vars, dataKeys, and React keys — overwriting data.
+  const usedSlugs = new Set<string>()
+  const keyToSlug = new Map<string, string>()
+  for (const c of categories) {
+    const base = slug(c) || 'cat'
+    let s = base
+    let n = 2
+    while (usedSlugs.has(s)) s = `${base}-${n++}`
+    usedSlugs.add(s)
+    keyToSlug.set(c, s)
+  }
 
   const config: ChartConfig = Object.fromEntries(
     categories.map((c, i) => [

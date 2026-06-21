@@ -5,23 +5,36 @@
 #   ~/go/bin/xcaddy build --with github.com/mholt/caddy-ratelimit
 #   sudo mv caddy /usr/local/bin/caddy && caddy version
 #
-# Replace yourdomain.com with your real domain, then:  caddy start --config Caddyfile
-# Caddy provisions HTTPS automatically and redirects HTTP -> HTTPS.
+# Replace YOUR_VPS_IP with your actual static IP, then:  caddy start --config Caddyfile
+# tls internal generates a self-signed cert — browser will warn on first visit,
+# click Advanced → Proceed. HTTPS is active and traffic is encrypted.
 
 {
 	# caddy-ratelimit is a third-party directive; tell Caddy where it sits.
 	order rate_limit before reverse_proxy
 }
 
-yourdomain.com {
+https://YOUR_VPS_IP {
+	tls internal
+
 	encode zstd gzip
 
-	# Throttle auth endpoints: max 10 requests per IP per minute -> 11th gets HTTP 429.
+	header {
+		X-Frame-Options "DENY"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		# ponytail: no HSTS — self-signed cert + HSTS causes browser lockout
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"
+		-Server
+	}
+
+	# Throttle auth endpoints: max 5 requests per IP per minute -> 6th gets HTTP 429.
 	@auth path /api/auth/*
 	rate_limit @auth {
 		zone auth_zone {
 			key {remote_host}
-			events 10
+			events 5
 			window 1m
 		}
 	}

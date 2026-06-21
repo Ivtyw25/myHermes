@@ -1,7 +1,6 @@
 # Hermes Dashboard
 
-A private OS for your own data. No cloud. No database. Files in, insights out.
-
+A self-hosted personal OS dashboard. It ingests my own data — finances, habits, notes, tasks — and surfaces insights through a unified interface. No cloud, no tracking, no subscriptions. Just own data, on my own vps.
 ---
 
 ## Environment Variables

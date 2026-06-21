@@ -7,11 +7,18 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-geist-sans);
+  --font-display: var(--font-display);
+  --font-heading: var(--font-display);
   --color-pos: var(--pos);
+  --color-pos-bg: var(--pos-bg);
   --color-neg: var(--neg);
+  --color-neg-bg: var(--neg-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-mint: var(--accent-mint);
+  --color-subtle-foreground: var(--subtle-foreground);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -33,54 +40,109 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.55);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-xl: calc(var(--radius) * 1.35);
+  --radius-2xl: calc(var(--radius) * 1.7);
 }
 
-/* ── Ledger Light ──────────────────────────────────────────────
-   Warm paper-white ground, near-black ink text, single deep
-   forest-green accent, hairline warm-gray borders. Light only. */
+/* ── Hermes Dashboard ──────────────────────────────────────────
+   Cool off-white canvas, two-tone green system (deep forest anchor
+   + emerald/mint accents), hairline cool-gray borders. Light only.
+   No #000/#FFF in components — tinted neutrals only. */
 :root {
-  --radius: 0.5rem;
+  --radius: 0.75rem;
+  color-scheme: light;
 
-  --background: oklch(0.977 0.007 83);       /* warm paper */
-  --foreground: oklch(0.23 0.006 75);        /* ink */
+  --background: oklch(0.974 0.003 240);        /* cool off-white canvas */
+  --foreground: oklch(0.24 0.004 250);         /* near-black ink */
 
-  --card: oklch(0.992 0.005 83);             /* near-white paper */
-  --card-foreground: oklch(0.23 0.006 75);
-  --popover: oklch(0.992 0.005 83);
-  --popover-foreground: oklch(0.23 0.006 75);
+  --card: oklch(0.996 0.001 240);              /* near-white surface */
+  --card-foreground: oklch(0.24 0.004 250);
+  --popover: oklch(0.996 0.001 240);
+  --popover-foreground: oklch(0.24 0.004 250);
 
-  --primary: oklch(0.40 0.072 158);          /* deep forest green */
-  --primary-foreground: oklch(0.98 0.01 83);
+  --primary: oklch(0.34 0.06 158);             /* deep forest green */
+  --primary-foreground: oklch(0.97 0.012 158);
 
-  --secondary: oklch(0.955 0.009 83);
-  --secondary-foreground: oklch(0.30 0.02 158);
+  --secondary: oklch(0.965 0.003 240);
+  --secondary-foreground: oklch(0.34 0.06 158);
 
-  --muted: oklch(0.955 0.009 83);
-  --muted-foreground: oklch(0.52 0.012 75);
+  --muted: oklch(0.964 0.003 240);
+  --muted-foreground: oklch(0.55 0.01 250);
+  --subtle-foreground: oklch(0.68 0.008 250); /* captions, axis ticks */
 
-  --accent: oklch(0.945 0.018 150);          /* faint green wash */
-  --accent-foreground: oklch(0.34 0.05 158);
+  --accent: oklch(0.95 0.022 158);             /* mint wash — nav active, hover */
+  --accent-foreground: oklch(0.34 0.06 158);
+  --accent-mint: oklch(0.82 0.11 158);         /* bright mint — light chart series, progress */
 
-  --destructive: oklch(0.52 0.13 28);        /* muted clay red */
+  --destructive: oklch(0.58 0.17 25);
 
-  --border: oklch(0.90 0.008 80);            /* hairline */
-  --input: oklch(0.90 0.008 80);
-  --ring: oklch(0.40 0.072 158);
+  --border: oklch(0.924 0.004 240);            /* hairline */
+  --input: oklch(0.924 0.004 240);
+  --ring: oklch(0.34 0.06 158);
 
-  /* semantic finance tones */
-  --pos: oklch(0.45 0.09 158);               /* income — forest */
-  --neg: oklch(0.52 0.13 28);                /* expense — clay */
+  /* semantic finance tones (+ soft pill backgrounds) */
+  --pos: oklch(0.58 0.12 158);                 /* income / positive — emerald */
+  --pos-bg: oklch(0.95 0.03 158);
+  --neg: oklch(0.58 0.17 25);                  /* expense / negative — red */
+  --neg-bg: oklch(0.95 0.028 25);
+  --warn: oklch(0.62 0.11 75);                 /* pending — amber */
+  --warn-bg: oklch(0.95 0.04 85);
 
-  /* chart palette — green-led, warm supporting hues */
-  --chart-1: oklch(0.45 0.09 158);
-  --chart-2: oklch(0.58 0.075 200);
-  --chart-3: oklch(0.64 0.12 52);
-  --chart-4: oklch(0.76 0.11 86);
-  --chart-5: oklch(0.55 0.035 255);
+  /* chart palette — forest-led greens + supporting teals */
+  --chart-1: oklch(0.40 0.08 158);             /* forest (income / primary series) */
+  --chart-2: oklch(0.78 0.12 158);             /* mint (expense / light series) */
+  --chart-3: oklch(0.55 0.10 178);             /* teal-green */
+  --chart-4: oklch(0.66 0.11 142);             /* leaf green */
+  --chart-5: oklch(0.50 0.055 220);            /* slate teal */
+}
+
+/* ── Dark — deep forest-charcoal ground, surfaces lifted by lightness,
+   accents brightened so emerald/mint pop. Borders are light hairlines. */
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.19 0.012 215);         /* near-black, faint cool green */
+  --foreground: oklch(0.95 0.005 220);         /* off-white */
+
+  --card: oklch(0.225 0.014 215);              /* lifted surface */
+  --card-foreground: oklch(0.95 0.005 220);
+  --popover: oklch(0.225 0.014 215);
+  --popover-foreground: oklch(0.95 0.005 220);
+
+  --primary: oklch(0.62 0.12 158);             /* brighter emerald-forest for dark */
+  --primary-foreground: oklch(0.17 0.02 158);
+
+  --secondary: oklch(0.27 0.013 215);
+  --secondary-foreground: oklch(0.92 0.02 158);
+
+  --muted: oklch(0.27 0.012 215);
+  --muted-foreground: oklch(0.70 0.012 220);
+  --subtle-foreground: oklch(0.58 0.012 220);
+
+  --accent: oklch(0.32 0.045 158);             /* dark mint wash — nav active, hover */
+  --accent-foreground: oklch(0.88 0.09 158);
+  --accent-mint: oklch(0.80 0.12 158);
+
+  --destructive: oklch(0.64 0.17 25);
+
+  --border: oklch(0.32 0.012 215);             /* visible hairline on dark */
+  --input: oklch(0.32 0.012 215);
+  --ring: oklch(0.62 0.12 158);
+
+  --pos: oklch(0.72 0.13 158);
+  --pos-bg: oklch(0.30 0.05 158);
+  --neg: oklch(0.70 0.15 25);
+  --neg-bg: oklch(0.31 0.06 25);
+  --warn: oklch(0.78 0.11 80);
+  --warn-bg: oklch(0.33 0.05 80);
+
+  --chart-1: oklch(0.55 0.11 158);
+  --chart-2: oklch(0.80 0.12 158);
+  --chart-3: oklch(0.64 0.11 178);
+  --chart-4: oklch(0.72 0.12 142);
+  --chart-5: oklch(0.62 0.07 220);
 }
 
 @layer base {
@@ -94,10 +156,50 @@
   html {
     @apply font-sans;
   }
-  /* tabular monospace figures for all financial numbers */
+  /* tabular monospace figures for dense data (tables, chart axes) */
   .nums {
     font-family: var(--font-geist-mono);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
   }
+  /* headline figures — display face, tabular so columns still align */
+  .stat {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Respect reduced-motion: neutralize entrance/transition animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Smooth theme transition — lets framer-motion icon anim play uninterrupted. */
+body,
+.card-elevate,
+header,
+aside {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
+}
+
+/* Soft tinted elevation for cards (forest-tinted, never pure black). */
+.card-elevate {
+  box-shadow:
+    0 1px 2px oklch(0.34 0.06 158 / 0.06),
+    0 10px 30px -12px oklch(0.34 0.06 158 / 0.12);
+}
+/* On dark, shadows read as murk — lean on the ring + a faint lift instead. */
+.dark .card-elevate {
+  box-shadow: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 12px 30px -18px oklch(0 0 0 / 0.6);
 }

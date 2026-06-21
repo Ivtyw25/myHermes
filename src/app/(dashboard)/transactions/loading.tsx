@@ -10,7 +10,7 @@ export default function TransactionsLoading() {
         <Bar className="h-9 w-36" />
         <Bar className="h-9 w-52" />
       </div>
-      <div className="overflow-hidden rounded-lg border border-border">
+      <div className="overflow-hidden rounded-xl border border-border">
         {[...Array(8)].map((_, i) => (
           <div key={i} className="flex gap-4 border-b border-border px-4 py-3 last:border-0">
             <Bar className="h-4 w-24" />

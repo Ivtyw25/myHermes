@@ -34,7 +34,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Hermes</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Private finance ledger</p>
+          <p className="mt-1 text-sm text-muted-foreground">Private dashboard</p>
         </div>
         <form
           onSubmit={handleSubmit}

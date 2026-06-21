@@ -1,7 +1,4 @@
-# GSD planning + local docs (kept local, not committed)
-.planning/
-docs/
-*.md
+# local claude project settings
 .claude/
 
 # dependencies
@@ -41,3 +38,7 @@ yarn-error.log*
 
 # git worktrees (per-phase isolation)
 .worktrees/
+
+# data
+/data
+.gstack/

@@ -25,23 +25,33 @@ const CategoryTrend = dynamic(() => import('./charts/CategoryTrend'), {
   ssr: false,
   loading: () => <Skeleton h="h-[352px]" />,
 })
+const DailySpendActual = dynamic(() => import('./charts/DailySpendActual'), {
+  ssr: false,
+  loading: () => <Skeleton h="h-[352px]" />,
+})
 
 interface OverviewChartsProps {
   donut: { category: string; amount: number }[]
   daily: { date: string; cumulative: number }[]
+  dailyActual: { date: string; amount: number }[]
   monthly: { month: string; income: number; expense: number }[]
   trend: CategoryMonthRow[]
 }
 
-export default function OverviewCharts({ donut, daily, monthly, trend }: OverviewChartsProps) {
+export default function OverviewCharts({ donut, daily, dailyActual, monthly, trend }: OverviewChartsProps) {
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <MonthlyBar data={monthly} />
+        </div>
         <CategoryDonut data={donut} />
-        <DailySpendLine data={daily} />
       </div>
-      <MonthlyBar data={monthly} />
-      <CategoryTrend data={trend} />
+      <div className="grid gap-4 md:gap-6 md:grid-cols-2">
+        <DailySpendLine data={daily} />
+        <CategoryTrend data={trend} />
+      </div>
+      <DailySpendActual data={dailyActual} />
     </div>
   )
 }

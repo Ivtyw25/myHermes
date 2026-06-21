@@ -38,6 +38,8 @@ function shortMonth(key: string): string {
   return new Date(y, m - 1, 1).toLocaleDateString('en-MY', { month: 'short' })
 }
 
+const fmtAxis = (v: number) => `RM ${new Intl.NumberFormat('en-MY', { notation: 'compact' }).format(v)}`
+
 export default function CategoryTrend({ data }: CategoryTrendProps) {
   const hasExpense = data.some((row) =>
     Object.entries(row).some(([k, v]) => k !== 'month' && typeof v === 'number' && v > 0)
@@ -64,7 +66,9 @@ export default function CategoryTrend({ data }: CategoryTrendProps) {
   const config: ChartConfig = Object.fromEntries(
     categories.map((c, i) => [
       keyToSlug.get(c)!,
-      { label: c, color: PALETTE[i % PALETTE.length] },
+      // 'Other' (capital) is the tail sentinel; real categories are lowercase.
+      // Relabel so it doesn't read as a duplicate of the real "other" category.
+      { label: c === 'Other' ? 'Other categories' : c, color: PALETTE[i % PALETTE.length] },
     ])
   )
 
@@ -81,14 +85,14 @@ export default function CategoryTrend({ data }: CategoryTrendProps) {
           <CartesianGrid vertical={false} stroke="var(--border)" />
           <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} fontSize={11} />
           <YAxis
-            tickFormatter={(v: number) => `RM ${v}`}
+            tickFormatter={fmtAxis}
             tickLine={false}
             axisLine={false}
-            width={64}
+            width={52}
             fontSize={11}
           />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <ChartLegend content={<ChartLegendContent />} />
+          <ChartLegend content={<ChartLegendContent className="flex-wrap capitalize" />} />
           {categories.map((c) => {
             const s = keyToSlug.get(c)!
             return <Bar key={s} dataKey={s} stackId="a" fill={`var(--color-${s})`} />

@@ -127,7 +127,7 @@ export async function readMonths(
 
 export function aggregateByCategoryDonut(
   transactions: Transaction[],
-  topN = 8
+  topN = 9
 ): { category: string; amount: number }[] {
   const expenses = transactions.filter((t) => t.type === 'expense')
   const totals = new Map<string, number>()
@@ -182,6 +182,26 @@ export function aggregateByCategoryMonth(
 
     return row
   })
+}
+
+export function getBillingPeriodTransactions(
+  prevTxns: Transaction[],
+  currTxns: Transaction[]
+): Transaction[] {
+  const fromPrev = prevTxns.filter((t) => parseInt(t.date.slice(8), 10) >= 27)
+  const fromCurr = currTxns.filter((t) => parseInt(t.date.slice(8), 10) <= 26)
+  return [...fromPrev, ...fromCurr].sort((a, b) => a.date.localeCompare(b.date))
+}
+
+export function aggregateDailyActual(
+  transactions: Transaction[]
+): { date: string; amount: number }[] {
+  const expenses = transactions.filter((t) => t.type === 'expense')
+  const map = new Map<string, number>()
+  for (const t of expenses) map.set(t.date, (map.get(t.date) ?? 0) + t.amount)
+  return [...map.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, amount]) => ({ date, amount: Math.round(amount * 100) / 100 }))
 }
 
 export function aggregateDailySpend(

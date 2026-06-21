@@ -1,6 +1,7 @@
-# Hermes Dashboard
+## Hermes Dashboard
 
-A self-hosted personal OS dashboard. It ingests my own data — finances, habits, notes, tasks — and surfaces insights through a unified interface. No cloud, no tracking, no subscriptions. Just own data, on my own vps.
+A self-hosted personal OS dashboard. It ingests my own data — finances, habits, notes, tasks and surfaces insights through a unified interface. No cloud, no tracking, no subscriptions. Just own data, on my own vps.
+
 ---
 
 ## Environment Variables

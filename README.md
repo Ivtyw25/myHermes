@@ -8,7 +8,7 @@ A self-hosted personal OS dashboard. It ingests my own data — finances, habits
 
 | Variable | Required | Description | How to fill in |
 |---|---|---|---|
-| `NEXTAUTH_URL` | yes | Public base URL of the site | `https://yourdomain.com` |
+| `NEXTAUTH_URL` | yes | Public base URL of the site | `https://YOUR_VPS_IP` |
 | `NEXTAUTH_SECRET` | yes | Session signing secret | `openssl rand -base64 32` |
 | `HERMES_PASSWORD_HASH` | yes | bcrypt hash of your dashboard password | `node -e "console.log(require('bcryptjs').hashSync('yourpassword',12))"` |
 | `HERMES_DATA_PATH` | yes | Absolute path to the directory where module data files live | `/home/hermes/data` |
@@ -42,7 +42,7 @@ Salary,2026-06-25,income,5000.00,income
 
 **1. Prerequisites**
 
-Node 20+ installed on the VPS. A domain with an A record pointing to the server IP.
+Node 20+, Go (for xcaddy), and a static IP on the VPS. No domain required.
 
 **2. Clone and build**
 
@@ -66,7 +66,7 @@ node -e "console.log(require('bcryptjs').hashSync('yourpassword',12))"
 Create `/home/hermes/hermes-dashboard/.env.production.local` (chmod 600, never commit):
 
 ```ini
-NEXTAUTH_URL=https://yourdomain.com
+NEXTAUTH_URL=https://YOUR_VPS_IP
 NEXTAUTH_SECRET=<openssl output>
 HERMES_PASSWORD_HASH=$2b$12$...raw hash, no escaping needed here
 HERMES_DATA_PATH=/home/hermes/data
@@ -88,7 +88,18 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now hermes-dashboard
 ```
 
-**5. Build Caddy with the rate-limit module**
+**5. Firewall — block direct access to port 3000**
+
+Port 3000 must never be reachable from the internet. Only Caddy (on 443) should be the entry point.
+
+```bash
+sudo ufw deny 3000
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw enable
+```
+
+**6. Build Caddy with the rate-limit module**
 
 Standard Caddy packages do not include `caddy-ratelimit` — build it with xcaddy:
 
@@ -98,20 +109,36 @@ go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 sudo mv caddy /usr/local/bin/caddy
 ```
 
-**6. Configure and start Caddy**
+**7. Configure and start Caddy**
 
-Copy `Caddyfile` from the repo to your server and replace `yourdomain.com` with your actual domain. Caddy provisions HTTPS automatically.
+Copy `Caddyfile` from the repo to your server and replace `YOUR_VPS_IP` with your actual static IP.
 
-```bash
-sudo caddy reload --config /path/to/Caddyfile
-```
-
-**7. Verify**
+Caddy uses `tls internal` to generate a self-signed cert — no domain needed. On first visit, the browser shows a "Your connection is not private" warning; click **Advanced → Proceed**. After that it works normally and all traffic is encrypted.
 
 ```bash
-systemctl status hermes-dashboard   # expect: active (running)
-curl -I https://yourdomain.com      # expect: HTTP 200 or 302 → /login
+sudo caddy start --config /path/to/Caddyfile
 ```
+
+**8. Verify**
+
+```bash
+systemctl status hermes-dashboard        # expect: active (running)
+curl -Ik https://YOUR_VPS_IP             # expect: HTTP 200 or 302 → /login
+curl -Ik https://YOUR_VPS_IP | grep -E "X-Frame-Options|X-Content-Type-Options"
+```
+
+---
+
+## Security
+
+| Layer | Detail |
+|---|---|
+| Password | bcrypt cost 12 |
+| Session | JWT, expires after 1 hour |
+| Rate limiting | 5 auth attempts per IP per minute (Caddy) |
+| Brute force | Login locks for 60s after 5 wrong attempts |
+| Transport | HTTPS via Caddy `tls internal` (self-signed) |
+| Headers | `X-Frame-Options`, `X-Content-Type-Options`, `CSP`, `Referrer-Policy`, `Permissions-Policy` |
 
 ---
 

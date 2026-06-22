@@ -49,7 +49,7 @@ Node 20+, Go (for xcaddy), and a static IP on the VPS. No domain required.
 ```bash
 git clone <repo-url> hermes-dashboard
 cd hermes-dashboard
-npm ci
+npm ci --omit=dev
 npm run build
 ```
 
